@@ -53,6 +53,12 @@
     <Compile Include="GUI\LoginForm.Designer.cs">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\LoginFormV2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\LoginFormV2.Designer.cs">
+      <DependentUpon>LoginFormV2.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\TheBakery.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -69,6 +75,9 @@
     </Compile>
     <EmbeddedResource Include="GUI\LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\LoginFormV2.resx">
+      <DependentUpon>LoginFormV2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\TheBakery.resx">
       <DependentUpon>TheBakery.cs</DependentUpon>
