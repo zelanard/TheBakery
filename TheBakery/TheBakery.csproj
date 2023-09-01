@@ -53,12 +53,6 @@
     <Compile Include="GUI\DisplayProduct.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="GUI\LoginForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\LoginForm.Designer.cs">
-      <DependentUpon>LoginForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="GUI\LoginFormV2.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -79,9 +73,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>TheBakeryDataSet.xsd</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="GUI\LoginForm.resx">
-      <DependentUpon>LoginForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="GUI\LoginFormV2.resx">
       <DependentUpon>LoginFormV2.cs</DependentUpon>
       <SubType>Designer</SubType>
