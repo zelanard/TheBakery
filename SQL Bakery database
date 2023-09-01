@@ -1,0 +1,728 @@
+USE MASTER;
+
+DROP DATABASE TheBakery;
+
+CREATE DATABASE TheBakery;
+
+GO
+    --go to the database
+    USE TheBakery;
+
+--create each table in the database
+--have no foreign keys
+CREATE TABLE Cities (
+    PostalCode INT PRIMARY KEY CHECK (PostalCode >= 0 AND PostalCode <= 9999),
+    CName VARCHAR(30)
+);
+
+CREATE TABLE Roles (
+    RoleId INT IDENTITY(1, 1) PRIMARY KEY,
+    RoleName VARCHAR(75)
+);
+
+CREATE TABLE Products(
+    ProductId INT IDENTITY(1, 1) PRIMARY KEY,
+    Quantity INT
+);
+
+CREATE TABLE Recipes(
+    RecipeId INT IDENTITY(1, 1) PRIMARY KEY,
+    RecipesName VARCHAR(60) NOT NULL,
+    Portions FLOAT NOT NULL,
+    Tempratures INT,
+    PrepTimeMin INT NOT NULL,
+    Price FLOAT NOT NULL,
+    Refs TEXT
+);
+
+CREATE TABLE Bakeries(
+    BakeryId INT IDENTITY(1, 1) PRIMARY KEY,
+    BakeryName VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE Categories(
+    CategoryId INT IDENTITY(1, 1) PRIMARY KEY,
+    CategoryName VARCHAR(50) NOT NULL
+);
+
+--have foreign keys
+CREATE TABLE Persons (
+    PersonId INT IDENTITY(1, 1) PRIMARY KEY,
+    FristName VARCHAR(50),
+    LastName VARCHAR(50),
+    StreetAddress VARCHAR(100),
+    Floors VARCHAR(10),
+    Country VARCHAR(50),
+    PostalCode INT FOREIGN KEY REFERENCES Cities(PostalCode)
+);
+
+CREATE TABLE Users (
+    EMail VARCHAR(100) PRIMARY KEY,
+    Username VARCHAR(30),
+    PASSWORD VARCHAR(64),
+    Tlf VARCHAR(20),
+    PersonId INT FOREIGN KEY REFERENCES Persons(PersonId)
+);
+
+CREATE TABLE Orders(
+    OrderId INT IDENTITY(1, 1) PRIMARY KEY,
+    FinalPrice INT NOT NULL,
+    PickupTime DATETIME NOT NULL,
+    Requirements VARCHAR(100),
+    OrderStatus VARCHAR(30) DEFAULT 'Placed',
+    OrderPlaced DATETIME NOT NULL,
+    EMail VARCHAR(100) FOREIGN KEY REFERENCES Users(EMail),
+    ProductId INT FOREIGN KEY REFERENCES Products(ProductId)
+);
+
+CREATE TABLE StockItems(
+    StockItemId INT IDENTITY(1, 1) PRIMARY KEY,
+    ItemName VARCHAR(50) NOT NULL,
+    Brand VARCHAR(30) NOT NULL,
+    Quantity INT NOT NULL,
+    ItemDescription VARCHAR(100),
+    PurchasePrice FLOAT NOT NULL,
+    SalePrice FLOAT NOT NULL,
+    BakeryID INT FOREIGN KEY REFERENCES Bakeries(BakeryId)
+);
+
+CREATE TABLE Ingredients(
+    IngredientId INT IDENTITY(1, 1) PRIMARY KEY,
+    Quantity INT NOT NULL,
+    StockItemId INT FOREIGN KEY REFERENCES StockItems(StockItemId)
+);
+
+--is many to many tables
+CREATE TABLE UsersRoles (
+    UserRoleId INT IDENTITY(1, 1) PRIMARY KEY,
+    EMail VARCHAR(100) FOREIGN KEY REFERENCES Users(EMail),
+    RoleId INT FOREIGN KEY REFERENCES Roles(RoleId)
+);
+
+CREATE TABLE BakeriesUsers (
+    BakeryUserId INT IDENTITY(1, 1) PRIMARY KEY,
+    BakeryId INT FOREIGN KEY REFERENCES Bakeries(BakeryId),
+    EMail VARCHAR(100) FOREIGN KEY REFERENCES Users(EMail)
+);
+
+CREATE TABLE ProductCategories(
+    ProductCategoriesId INT IDENTITY(1, 1) PRIMARY KEY,
+    ProductId INT FOREIGN KEY REFERENCES Products(ProductID),
+    CategoryId INT FOREIGN KEY REFERENCES Categories(CategoryID)
+);
+
+CREATE TABLE RecipesCategory(
+    RecipesCategoryId INT IDENTITY(1, 1) PRIMARY KEY,
+    RecipeId INT FOREIGN KEY REFERENCES Recipes(RecipeID),
+    CategoryId INT FOREIGN KEY REFERENCES Categories(CategoryID)
+);
+
+CREATE TABLE RecipesProducts(
+    RecipesProductsId INT IDENTITY(1, 1) PRIMARY KEY,
+    RecipeId INT FOREIGN KEY REFERENCES Recipes(RecipeID),
+    ProductId INT FOREIGN KEY REFERENCES Products(ProductID)
+);
+
+CREATE TABLE StockItemsCategories(
+    StockItemCategoryID INT IDENTITY(1, 1) PRIMARY KEY,
+    StockItemID INT FOREIGN KEY REFERENCES StockItems(StockItemID),
+    CategoryID INT FOREIGN KEY REFERENCES Categories(CategoryID)
+);
+
+CREATE TABLE RecipesBakeries(
+    RecipeBakeryId INT IDENTITY(1, 1) PRIMARY KEY,
+    RecipeId INT FOREIGN KEY REFERENCES Recipes(RecipeId),
+    BakeryId INT FOREIGN KEY REFERENCES Bakeries(BakeryId)
+);
+
+CREATE TABLE RecipesIngredients(
+    RecipeIngredientId INT IDENTITY(1, 1) PRIMARY KEY,
+    RecipeId INT FOREIGN KEY REFERENCES Recipes(RecipeId),
+    IngredientId INT FOREIGN KEY REFERENCES Ingredients(IngredientId)
+);
+
+CREATE TABLE OrdersProducts(
+    OrderProductId INT IDENTITY(1, 1) PRIMARY KEY,
+    OrderId INT FOREIGN KEY REFERENCES Orders(OrderId),
+    ProductId INT FOREIGN KEY REFERENCES Products(ProductId)
+);
+GO
+CREATE PROCEDURE dbo.InsertIntoCities
+    @PostalCode INT,
+    @CName VARCHAR(30)
+AS
+BEGIN
+    INSERT INTO Cities(
+        PostalCode,
+        CName
+    )
+    VALUES
+    (
+        @PostalCode,
+        @CName
+    )
+END;
+GO
+        EXEC dbo.InsertIntoCities @PostalCode = 4180, @CName = 'Sorø';
+		EXEC dbo.InsertIntoCities @PostalCode = 4200, @CName = 'Slagelse';
+		EXEC dbo.InsertIntoCities @PostalCode = 4100, @CName = 'Ringsted';
+GO
+CREATE PROCEDURE dbo.InsertIntoRoles
+    @RoleName VARCHAR(75)
+AS
+BEGIN
+    INSERT INTO Roles(
+        RoleName
+    )
+    VALUES
+    (
+        @RoleName
+    )
+END;
+GO
+EXEC dbo.InsertIntoRoles @RoleName = 'Admin';
+EXEC dbo.InsertIntoRoles @RoleName = 'Staff';
+EXEC dbo.InsertIntoRoles @RoleName = 'Custommer';
+
+GO
+CREATE PROCEDURE dbo.InsertIntoProducts 
+    @Quantity INT
+AS
+BEGIN
+    INSERT INTO Products(
+        Quantity
+    )
+    VALUES
+    (
+        @Quantity
+    )
+END;
+GO
+EXEC dbo.InsertIntoProducts	@Quantity= 34;
+EXEC dbo.InsertIntoProducts	@Quantity= 56;
+EXEC dbo.InsertIntoProducts	@Quantity= 50;
+
+GO
+CREATE PROCEDURE dbo.InsertIntoRecipes 
+    @RecipesName VARCHAR(60),
+    @Portions FLOAT,
+    @Tempratures INT,
+    @PrepTimeMin INT,
+    @Price FLOAT,
+    @Refs TEXT
+AS
+BEGIN
+    INSERT INTO Recipes(
+        RecipesName,
+        Portions,
+        Tempratures,
+        PrepTimeMin,
+        Price,
+        Refs
+    )
+    VALUES
+    (
+        @RecipesName,
+        @Portions,
+        @Tempratures,
+        @PrepTimeMin,
+        @Price,
+        @Refs
+    )
+END;
+
+GO
+EXEC dbo.InsertIntoRecipes @RecipesName ='Smørcreme',@Portions = 12 ,@Tempratures = 210 ,@PrepTimeMin = 45, @Price = 150, @Refs = 'Butta';
+EXEC dbo.InsertIntoRecipes @RecipesName ='Sprøjteglasur',@Portions = 11 ,@Tempratures = 150 ,@PrepTimeMin = 90, @Price = 56, @Refs = 'Glaze';
+EXEC dbo.InsertIntoRecipes @RecipesName ='Kransekage Vugge',@Portions = 30,@Tempratures = 250 ,@PrepTimeMin = 150, @Price = 300, @Refs = 'Kranse';
+EXEC dbo.InsertIntoRecipes @RecipesName ='Choco troffel',@Portions = 5 ,@Tempratures = 120 ,@PrepTimeMin = 250, @Price = 543, @Refs = 'Chocolet';
+
+--This is sudo data
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Chocolate Chip Cookies', @Portions = 24, @Tempratures = 350, @PrepTimeMin = 15, @Price = 60, @Refs = 'cookie_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Blueberry Muffins', @Portions = 12, @Tempratures = 375, @PrepTimeMin = 20, @Price = 75, @Refs = 'muffin_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Banana Bread', @Portions = 10, @Tempratures = 325, @PrepTimeMin = 30, @Price = 50, @Refs = 'bread_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Carrot Cake', @Portions = 16, @Tempratures = 350, @PrepTimeMin = 45, @Price = 130, @Refs = 'cake_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Pumpkin Pie', @Portions = 8, @Tempratures = 375, @PrepTimeMin = 60, @Price = 100, @Refs = 'pie_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Lemon Bars', @Portions = 12, @Tempratures = 325, @PrepTimeMin = 35, @Price = 85, @Refs = 'bar_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Red Velvet Cupcakes', @Portions = 24, @Tempratures = 350, @PrepTimeMin = 25, @Price = 110, @Refs = 'cupcake_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Cinnamon Rolls', @Portions = 8, @Tempratures = 375, @PrepTimeMin = 40, @Price = 70, @Refs = 'roll_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Cheesecake', @Portions = 12, @Tempratures = 325, @PrepTimeMin = 50, @Price = 150, @Refs = 'cheesecake_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Chocolate Brownies', @Portions = 16, @Tempratures = 350, @PrepTimeMin = 30, @Price = 90, @Refs = 'brownie_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Apple Pie', @Portions = 8, @Tempratures = 375, @PrepTimeMin = 45, @Price = 95, @Refs = 'pie_recipe_2';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Peanut Butter Cookies', @Portions = 24, @Tempratures = 350, @PrepTimeMin = 20, @Price = 70, @Refs = 'cookie_recipe_2';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Strawberry Shortcake', @Portions = 8, @Tempratures = 325, @PrepTimeMin = 30, @Price = 120, @Refs = 'cake_recipe_2';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Raspberry Scones', @Portions = 12, @Tempratures = 375, @PrepTimeMin = 25, @Price = 80, @Refs = 'scone_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Peach Cobbler', @Portions = 8, @Tempratures = 350, @PrepTimeMin = 40, @Price = 105, @Refs = 'cobbler_recipe_1';
+
+GO
+CREATE PROCEDURE dbo.InsertIntoBakeries 
+    @BakeryName VARCHAR(50)
+AS
+BEGIN
+    INSERT INTO Bakeries(
+        BakeryName
+    )
+    VALUES
+    (
+        @BakeryName
+    )
+END;
+GO
+EXEC dbo.InsertIntoBakeries @BakeryName = 'Jhons Bakers';
+
+GO
+CREATE PROCEDURE dbo.InsertIntoCategories 
+    @CategoryName VARCHAR(50)
+AS
+BEGIN
+    INSERT INTO Categories(
+        CategoryName
+    )
+    VALUES
+    (
+        @CategoryName
+    )
+END;
+GO
+EXEC dbo.InsertIntoCategories @CategoryName = 'Gluten fri';
+EXEC dbo.InsertIntoCategories @CategoryName = 'Baget Kage';
+EXEC dbo.InsertIntoCategories @CategoryName = 'Deco';
+EXEC dbo.InsertIntoCategories @CategoryName = 'Creme';
+EXEC dbo.InsertIntoCategories @CategoryName = 'Fillings';
+
+
+GO
+CREATE PROCEDURE dbo.InsertIntoPersons 
+    @FristName VARCHAR(50),
+    @LastName VARCHAR(50),
+    @StreetAddress VARCHAR(100),
+    @Floors VARCHAR(10),
+    @Country VARCHAR(50),
+    @PostalCode INT
+AS
+BEGIN
+    INSERT INTO Persons(
+        FristName,
+        LastName,
+        StreetAddress,
+        Floors,
+        Country,
+        PostalCode
+    )
+    VALUES
+    (
+        @FristName,
+        @LastName,
+        @StreetAddress,
+        @Floors,
+        @Country,
+        @PostalCode
+    )
+END;
+GO
+EXEC dbo.InsertIntoPersons
+    @FristName = 'Jhon',
+    @LastName = 'Pedersen',
+    @StreetAddress = 'Nyvej 34',
+    @Floors = '8',
+    @Country = 'Denmark',
+    @PostalCode = 4100;
+
+	EXEC dbo.InsertIntoPersons
+    @FristName = 'Killigan',
+    @LastName = 'Pedersen',
+    @StreetAddress = 'væstergård 1',
+    @Floors = '2',
+    @Country = 'Denmark',
+    @PostalCode = 4200;
+
+	EXEC dbo.InsertIntoPersons
+    @FristName = 'Jugen',
+    @LastName = 'Juger',
+    @StreetAddress = 'NewGård 4',
+    @Floors = '5',
+    @Country = 'Denmark',
+    @PostalCode = 4100;
+	
+	
+	GO
+CREATE PROCEDURE dbo.InsertIntoUsers 
+    @EMail VARCHAR(100),
+    @Username VARCHAR(30),
+    @PASSWORD VARCHAR(64),
+    @Tlf VARCHAR(20),
+    @PersonId INT
+AS
+BEGIN
+    DECLARE @validEmail BIT;
+    --DECLARE @validPass BIT;
+    --DECLARE @validTlf BIT;
+    
+    -- Check if the email format is valid
+    SET @validEmail = CASE WHEN @EMail LIKE '[A-Za-z0-9._%-]%@[A-Za-z0-9.-]%.[A-Za-z]%' THEN 1 ELSE 0 END;
+    --SET @validPass = CASE WHEN @Password LIKE '%^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[PASSWORD-Za-z\d@$!%*?&]{8,}$%' THEN 1 ELSE 0 END;
+    --SET @validTlf = CASE WHEN @Tlf LIKE '^[\d+](?:(?<=\d) |\d){4,20}$' THEN 1 ELSE 0 END;
+
+    
+    IF @validEmail = 1
+    --IF @validPass = 1
+    --IF @validTlf = 1
+    BEGIN
+        INSERT INTO Users (
+            EMail,
+            Username,
+            [Password],
+            Tlf,
+            PersonId
+        )
+        VALUES (
+            @EMail,
+            @Username,
+            @Password,
+            @Tlf,
+            @PersonId
+        );
+        
+        SELECT 'User inserted successfully.' AS Result;
+    END;
+    ELSE
+    BEGIN
+        SELECT 'Invalid E-mail! User was not inserted.' AS Result;
+    END;
+    --ELSE
+    --BEGIN
+    --    SELECT 'Invalid Password! User was not inserted.' AS Result;
+    --END
+    --ELSE
+    --BEGIN
+    --    SELECT 'Invalid Phone Number! User was not inserted.' AS Result;
+    --END;
+END;
+
+GO
+EXEC dbo.InsertIntoUsers @EMail = 'Killigan@zbc.com' ,@Username = 'Killigan321!' ,@Password = '!!1234' ,@Tlf = '12345678' ,@PersonId = 1 ;
+EXEC dbo.InsertIntoUsers @EMail = 'Jhon@zbc.com' ,@Username = 'Jhon243!' ,@Password = '!!1234' ,@Tlf = '12345678' ,@PersonId = 2;
+EXEC dbo.InsertIntoUsers @EMail = 'Jurgen@abc.com' ,@Username = 'Jurgen543?' ,@Password = '!!1234' ,@Tlf = '12345678' ,@PersonId = 3;
+
+
+GO
+CREATE PROCEDURE dbo.InsertIntoOrders 
+    @FinalPrice INT,
+    @PickupTime DATETIME,
+    @Requirements VARCHAR(100),
+    @OrderStatus VARCHAR(30),
+    @OrderPlaced DATETIME,
+    @EMail VARCHAR(100),
+    @ProductId INT
+AS
+BEGIN
+--todo: Validate Order Status in accordance to the Enum.
+    INSERT INTO Orders(
+        FinalPrice,
+        PickupTime,
+        Requirements,
+        OrderStatus,
+        OrderPlaced,
+        EMail,
+        ProductId
+    )
+    VALUES
+    (
+        @FinalPrice,
+        @PickupTime,
+        @Requirements,
+        @OrderStatus,
+        @OrderPlaced,
+        @EMail,
+        @ProductId
+    )
+END;
+GO
+EXEC dbo.InsertIntoOrders @FinalPrice = 1504, @PickupTime = '20120618 10:34:09 AM', @Requirements = '0',@OrderStatus = 'Completed' ,@OrderPlaced = '20120618 10:34:09 AM', @EMail = 'Killigan@zbc.com', @ProductId = 1;
+EXEC dbo.InsertIntoOrders @FinalPrice = 1504, @PickupTime = '20120618 10:34:09 AM', @Requirements = '0',@OrderStatus = 'Completed' ,@OrderPlaced = '20120618 10:34:09 AM', @EMail = 'Jhon@zbc.com', @ProductId = 1;
+EXEC dbo.InsertIntoOrders @FinalPrice = 1504, @PickupTime = '20120618 10:34:09 AM', @Requirements = '0',@OrderStatus = 'Completed' ,@OrderPlaced = '20120618 10:34:09 AM', @EMail = 'Jurgen@abc.com', @ProductId = 1;
+
+GO
+CREATE PROCEDURE dbo.InsertIntoStockItems 
+    @ItemName VARCHAR(50),
+    @Brand VARCHAR(30),
+    @Quantity INT,
+    @ItemDescription VARCHAR(100),
+    @PurchasePrice FLOAT,
+    @SalePrice FLOAT,
+    @BakeryID INT
+AS
+BEGIN
+    INSERT INTO StockItems(
+        ItemName,
+        Brand,
+        Quantity,
+        ItemDescription,
+        PurchasePrice,
+        SalePrice,
+        BakeryID
+    )
+    VALUES
+    (
+        @ItemName,
+        @Brand,
+        @Quantity,
+        @ItemDescription,
+        @PurchasePrice,
+        @SalePrice,
+        @BakeryID
+    )
+END;
+GO
+EXEC dbo.InsertIntoStockItems @ItemName = 'Sukker', @Brand = 'Dansk sukker', @Quantity = 34, @ItemDescription = 'Dette er Sukker', @PurchasePrice = 16.83, @SalePrice = 35, @BakeryID = 1;
+EXEC dbo.InsertIntoStockItems @ItemName = 'Flormelis', @Brand = 'Dansk sukker', @Quantity = 54, @ItemDescription = 'Dette er Flormelis', @PurchasePrice = 7.62, @SalePrice = 15, @BakeryID = 1;
+EXEC dbo.InsertIntoStockItems @ItemName = 'Smør', @Brand = 'Arla', @Quantity = 12, @ItemDescription = 'Dette er Smør', @PurchasePrice = 74.20, @SalePrice = 90, @BakeryID = 1;
+EXEC dbo.InsertIntoStockItems @ItemName = 'Viniljesukker', @Brand = 'Viniljesukker', @Quantity = 56, @ItemDescription = 'Dette er Viniljesukker', @PurchasePrice = 222.05 , @SalePrice = 400, @BakeryID = 1;
+EXEC dbo.InsertIntoStockItems @ItemName = 'Past. Æggehvider' , @Brand = 'Unknown', @Quantity = 67, @ItemDescription = 'Dette er Past. Æggehvider', @PurchasePrice = 20.79, @SalePrice = 47, @BakeryID = 1;
+EXEC dbo.InsertIntoStockItems @ItemName = 'Kranse XX', @Brand = 'Odensemasipan', @Quantity = 100, @ItemDescription = 'Dette er Kranse Kage', @PurchasePrice = 67.77, @SalePrice = 85, @BakeryID = 1;
+EXEC dbo.InsertIntoStockItems @ItemName = 'Heavy Creme', @Brand = 'Arla', @Quantity = 159, @ItemDescription = 'Dette er Heavy Creme', @PurchasePrice = 50, @SalePrice = 70, @BakeryID = 1;
+EXEC dbo.InsertIntoStockItems @ItemName = 'Milk Chocolet', @Brand = 'Call', @Quantity = 134, @ItemDescription = 'Dette er Mælke chokolade', @PurchasePrice = 120, @SalePrice = 175, @BakeryID = 1;
+GO
+CREATE PROCEDURE dbo.InsertIntoIngredients 
+    @Quantity INT,
+    @StockItemId INT
+AS
+BEGIN
+    INSERT INTO Ingredients(
+        Quantity,
+        StockItemId
+    )
+    VALUES
+    (
+        @Quantity,
+        @StockItemId
+    )
+END;
+GO
+EXEC dbo.InsertIntoIngredients @Quantity = 34, @StockItemId = 1;
+EXEC dbo.InsertIntoIngredients @Quantity = 54, @StockItemId = 2;
+EXEC dbo.InsertIntoIngredients @Quantity = 12, @StockItemId = 3;
+EXEC dbo.InsertIntoIngredients @Quantity = 56, @StockItemId = 4;
+EXEC dbo.InsertIntoIngredients @Quantity = 67, @StockItemId = 5;
+EXEC dbo.InsertIntoIngredients @Quantity = 100, @StockItemId = 6;
+EXEC dbo.InsertIntoIngredients @Quantity = 167, @StockItemId = 7;
+EXEC dbo.InsertIntoIngredients @Quantity = 200, @StockItemId = 8;
+
+
+
+GO
+--is many to many tables
+CREATE PROCEDURE dbo.InsertIntoUsersRoles 
+    @EMail VARCHAR(100),
+    @RoleId INT
+AS
+BEGIN
+    INSERT INTO UsersRoles(
+        EMail,
+        RoleId
+    )
+    VALUES
+    (
+        @EMail,
+        @RoleId
+    )
+END;
+GO
+EXEC dbo.InsertIntoUsersRoles @Email = 'Killigan@zbc.com', @RoleId = 1;
+EXEC dbo.InsertIntoUsersRoles @Email = 'Jhon@zbc.com', @RoleId = 2;
+EXEC dbo.InsertIntoUsersRoles @Email = 'Jurgen@abc.com', @RoleId = 3;
+
+GO
+CREATE PROCEDURE dbo.InsertIntoBakeriesUsers 
+    @BakeryId INT,
+    @EMail VARCHAR(100)
+AS
+BEGIN
+    INSERT INTO BakeriesUsers(
+        BakeryId,
+        EMail
+    )
+    VALUES
+    (
+        @BakeryId,
+        @EMail
+    )
+END;
+GO
+EXEC dbo.InsertIntoBakeriesUsers @BakeryId = 1, @EMail = 'Killigan@zbc.com';
+EXEC dbo.InsertIntoBakeriesUsers @BakeryId =  1, @EMail = 'Jhon@zbc.com';
+EXEC dbo.InsertIntoBakeriesUsers @BakeryId = 1, @EMail = 'Jurgen@abc.com';
+
+
+GO
+CREATE PROCEDURE dbo.InsertIntoProductCategories 
+    @ProductId INT,
+    @CategoryId INT
+AS
+BEGIN
+    INSERT INTO ProductCategories(
+        ProductId,
+        CategoryId
+    )
+    VALUES
+    (
+        @ProductId,
+        @CategoryId
+    )
+END;
+
+GO
+CREATE PROCEDURE dbo.InsertIntoRecipesCategory 
+    @RecipeId INT,
+    @CategoryId INT
+AS
+BEGIN
+    INSERT INTO RecipesCategory(
+        RecipeId,
+        CategoryId
+    )
+    VALUES
+    (
+        @RecipeId,
+        @CategoryId
+    )
+END;
+GO
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 1, @CategoryId = 1;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 2, @CategoryId = 2;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 3, @CategoryId = 3;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 4, @CategoryId = 4;
+
+-- this is sudo data
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 5, @CategoryId = 1;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 6, @CategoryId = 2;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 7, @CategoryId = 3;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 8, @CategoryId = 4;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 9, @CategoryId = 5;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 10, @CategoryId = 1;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 11, @CategoryId = 2;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 12, @CategoryId = 3;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 13, @CategoryId = 4;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 14, @CategoryId = 5;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 15, @CategoryId = 1;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 16, @CategoryId = 2;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 17, @CategoryId = 3;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 18, @CategoryId = 4;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 19, @CategoryId = 5;
+
+GO
+CREATE PROCEDURE dbo.InsertIntoRecipesProducts 
+    @RecipeId INT,
+    @ProductId INT
+AS
+BEGIN
+    INSERT INTO RecipesProducts(
+        RecipeId,
+        ProductId
+    )
+    VALUES
+    (
+        @RecipeId,
+        @ProductId
+    )
+END;
+GO
+
+EXEC dbo.InsertIntoRecipesProducts @RecipeId = 1, @ProductId = 1;
+EXEC dbo.InsertIntoRecipesProducts @RecipeId = 2, @ProductId = 2;
+EXEC dbo.InsertIntoRecipesProducts @RecipeId = 3, @ProductId = 3;
+
+GO
+CREATE PROCEDURE dbo.InsertIntoStockItemsCategories 
+    @StockItemID INT,
+    @CategoryID INT
+AS
+BEGIN
+    INSERT INTO StockItemsCategories(
+        StockItemID,
+        CategoryID
+    )
+    VALUES
+    (
+        @StockItemID,
+        @CategoryID
+    )
+END;
+GO
+EXEC dbo.InsertIntoStockItemsCategories @StockItemID = 1, @CategoryID = 1;
+EXEC dbo.InsertIntoStockItemsCategories @StockItemID = 2, @CategoryID = 1;
+EXEC dbo.InsertIntoStockItemsCategories @StockItemID = 3, @CategoryID = 1;
+EXEC dbo.InsertIntoStockItemsCategories @StockItemID = 4, @CategoryID = 1;
+EXEC dbo.InsertIntoStockItemsCategories @StockItemID = 5, @CategoryID = 1;
+EXEC dbo.InsertIntoStockItemsCategories @StockItemID = 6, @CategoryID = 1;
+EXEC dbo.InsertIntoStockItemsCategories @StockItemID = 7, @CategoryID = 1;
+EXEC dbo.InsertIntoStockItemsCategories @StockItemID = 8, @CategoryID = 1;
+
+
+GO
+CREATE PROCEDURE dbo.InsertIntoRecipesBakeries 
+    @RecipeId INT,
+    @BakeryId INT
+AS
+BEGIN
+    INSERT INTO RecipesBakeries(
+        RecipeId,
+        BakeryId
+    )
+    VALUES
+    (
+        @RecipeId,
+        @BakeryId
+    )
+END;
+GO
+EXEC dbo.InsertIntoRecipesBakeries @RecipeId = 1, @BakeryId = 1;
+EXEC dbo.InsertIntoRecipesBakeries @RecipeId = 2, @BakeryId = 1;
+EXEC dbo.InsertIntoRecipesBakeries @RecipeId = 3, @BakeryId = 1;
+
+
+GO
+CREATE PROCEDURE dbo.InsertIntoRecipesIngredients 
+    @RecipeId INT,
+    @IngredientId INT
+AS
+BEGIN
+    INSERT INTO RecipesIngredients(
+        RecipeId,
+        IngredientId
+    )
+    VALUES
+    (
+        @RecipeId,
+        @IngredientId
+    )
+END;
+GO
+EXEC dbo.InsertIntoRecipesIngredients  @RecipeId = 1,  @IngredientId = 1;
+EXEC dbo.InsertIntoRecipesIngredients  @RecipeId = 2,  @IngredientId = 2;
+EXEC dbo.InsertIntoRecipesIngredients  @RecipeId = 3,  @IngredientId = 3;
+
+GO
+CREATE PROCEDURE dbo.SelectRecipeByCategory @CategoryId INT AS BEGIN WITH temp (RecipieId) AS (
+    SELECT
+        RecipesCategory.RecipeId
+    FROM
+        RecipesCategory
+    WHERE
+        RecipesCategory.CategoryId = @CategoryId
+)
+SELECT
+    *
+FROM
+    Recipes,
+    temp
+WHERE
+    Recipes.RecipeId = temp.RecipieId
+END;
+
+GO
+CREATE PROCEDURE dbo.SelectCategories 
+AS
+BEGIN
+    SELECT CategoryName FROM Categories;
+END;
