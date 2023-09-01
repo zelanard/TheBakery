@@ -4,6 +4,13 @@ using TheBakery.DataAccessLayer;
 
 namespace TheBakery.GUI
 {
+
+        /// <summary>
+        /// this class stands for the creationof the "boxes" in the display
+        /// it infroms about the price, descreption, name, prep time, potions.
+        /// it is also supposed to hold servural other options that are not active at the moment
+        /// such as a piture palce holder that puts a piture into the dispaly box
+        /// </summary>
     internal class DisplayProduct : Control
     {
         private Product _product;

@@ -12,7 +12,8 @@ namespace TheBakery.DataAccessLayer
     {
         public const string DB_CONNECTION_STRING = @"Data Source=BALDER\MSSQLSERVER01;Initial Catalog=TheBakery;Integrated Security=True";
         /// <summary>
-        /// 
+        /// The data below within the whole class is what goes into the list the Gui displays
+        /// any number or sign typed here will alter the outcome of the display results.
         /// </summary>
         /// <param name="CategoryId"></param>
         /// <returns>Array of products</returns>
