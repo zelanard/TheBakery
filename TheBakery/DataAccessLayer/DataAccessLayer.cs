@@ -1,37 +1,84 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace TheBakery.DataAccessLayer
 {
-    public class DataAccess
+    public static class DataAccess
     {
         public const string DB_CONNECTION_STRING = @"Data Source=BALDER\MSSQLSERVER01;Initial Catalog=TheBakery;Integrated Security=True";
-        public void ConnectToDatabase()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="CategoryId"></param>
+        /// <returns>Array of products</returns>
+        public static Product[] GetProducts(int CategoryId)
         {
-
-        }
-
-        public Product[] GetProducts(string Category)
-        {
-            string SelectProducts = $"EXEC dbo.SelectProducts @Category = {Category}";
+            string SelectRecipes = $"EXEC dbo.SelectRecipeByCategory {CategoryId}";
             List<Product> Products = new List<Product>();
 
             using (SqlConnection conn = new SqlConnection(DB_CONNECTION_STRING))
             {
                 conn.Open();
-                using (SqlCommand cmd = new SqlCommand(SelectProducts, conn))
+                using (SqlCommand cmd = new SqlCommand(SelectRecipes, conn))
                 {
-                    cmd.ExecuteNonQuery();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read()) // Loop through each row
+                        {
+                            Recipes Recipe = new Recipes
+                            {
+                                RecipesName = reader["RecipesName"].ToString(),
+                                Price = float.Parse(reader["Price"].ToString()),
+                                Tempratures = int.Parse(reader["Tempratures"].ToString()),
+                                Portions = int.Parse(reader["Portions"].ToString()),
+                                PrepTimeMin = int.Parse(reader["PrepTimeMin"].ToString()),
+                                RecipeId = int.Parse(reader["RecipieId"].ToString()),
+                                Refs = reader["Refs"].ToString()
+                            };
+
+                            Product product = new Product(Recipe);
+                            Products.Add(product); // Add the product to the list
+                        }
+                    }
                 }
             }
             return Products.ToArray();
         }
+        /// <summary>
+        /// Looks up categories in the database.
+        /// </summary>
+        /// <returns>String Array containing all categories</returns>
+        public static string[] GetListOfCategories()
+        {
+            string SelectCategories = $"EXEC dbo.SelectCategories";
+            List<string> Categories = new List<string>();
+
+            using (SqlConnection conn = new SqlConnection(DB_CONNECTION_STRING))
+            {
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand(SelectCategories, conn))
+                {
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read()) // Loop through each row
+                        {
+                            Categories.Add(reader["CategoryName"].ToString());
+                        }
+                    }
+                }
+            }
+            return Categories.ToArray();
+        }
     }
 
+    /****************************************************************
+     * Here Be Logic: All of this should be moved to the logic layer!
+     ***************************************************************/
     public class Cities
     {
         int PostalCode { get; set; }
@@ -44,21 +91,43 @@ namespace TheBakery.DataAccessLayer
         string RoleName { get; set; }
     }
 
+    /// <summary>
+    /// Product Data Item
+    /// </summary>
     public class Product
     {
-        int ProductId { get; set; }
-        int Quantity { get; set; }
+        public int ProductId { get; set; }
+        public int Quantity { get; set; }
+        public string Name { get; set; }
+        public string Price { get; set; }
+        public string Description { get; set; }
+        public Recipes Recipe { get; set; }
+        public Product(Recipes res)
+        {
+            this.Recipe = res;
+            this.ProductId = res.RecipeId;
+            this.Name = res.RecipesName;
+            this.Price = res.Price.ToString();
+            this.Description = CreateDescription(res);
+        }
+        private string CreateDescription(Recipes res)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("PrepTime: " + res.PrepTimeMin.ToString() + " ");
+            sb.Append("Portions: " + res.Portions.ToString());
+            return sb.ToString();
+        }
     }
 
     public class Recipes
     {
-        int RecipeId { get; set; }
-        string RecipesName { get; set; }
-        float Portions { get; set; }
-        int Tempratures { get; set; }
-        int PrepTimeMin { get; set; }
-        float Price { get; set; }
-        string Refs { get; set; }
+        public int RecipeId { get; set; }
+        public string RecipesName { get; set; }
+        public float Portions { get; set; }
+        public int Tempratures { get; set; }
+        public int PrepTimeMin { get; set; }
+        public float Price { get; set; }
+        public string Refs { get; set; }
     }
 
     public class Bakeries
@@ -69,8 +138,8 @@ namespace TheBakery.DataAccessLayer
 
     public class Categories
     {
-        int CategoryId { get; set; }
-        string CategoryName { get; set; }
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; }
     }
 
     public class Persons

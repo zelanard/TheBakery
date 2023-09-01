@@ -47,6 +47,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataAccessLayer\DataAccessLayer.cs" />
+    <Compile Include="GUI\DisplayProduct.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="GUI\LoginForm.cs">
       <SubType>Form</SubType>
     </Compile>
