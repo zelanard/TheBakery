@@ -237,6 +237,23 @@ EXEC dbo.InsertIntoRecipes @RecipesName ='Sprøjteglasur',@Portions = 11 ,@Tempr
 EXEC dbo.InsertIntoRecipes @RecipesName ='Kransekage Vugge',@Portions = 30,@Tempratures = 250 ,@PrepTimeMin = 150, @Price = 300, @Refs = 'Kranse';
 EXEC dbo.InsertIntoRecipes @RecipesName ='Choco troffel',@Portions = 5 ,@Tempratures = 120 ,@PrepTimeMin = 250, @Price = 543, @Refs = 'Chocolet';
 
+--This is sudo data
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Chocolate Chip Cookies', @Portions = 24, @Tempratures = 350, @PrepTimeMin = 15, @Price = 60, @Refs = 'cookie_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Blueberry Muffins', @Portions = 12, @Tempratures = 375, @PrepTimeMin = 20, @Price = 75, @Refs = 'muffin_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Banana Bread', @Portions = 10, @Tempratures = 325, @PrepTimeMin = 30, @Price = 50, @Refs = 'bread_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Carrot Cake', @Portions = 16, @Tempratures = 350, @PrepTimeMin = 45, @Price = 130, @Refs = 'cake_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Pumpkin Pie', @Portions = 8, @Tempratures = 375, @PrepTimeMin = 60, @Price = 100, @Refs = 'pie_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Lemon Bars', @Portions = 12, @Tempratures = 325, @PrepTimeMin = 35, @Price = 85, @Refs = 'bar_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Red Velvet Cupcakes', @Portions = 24, @Tempratures = 350, @PrepTimeMin = 25, @Price = 110, @Refs = 'cupcake_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Cinnamon Rolls', @Portions = 8, @Tempratures = 375, @PrepTimeMin = 40, @Price = 70, @Refs = 'roll_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Cheesecake', @Portions = 12, @Tempratures = 325, @PrepTimeMin = 50, @Price = 150, @Refs = 'cheesecake_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Chocolate Brownies', @Portions = 16, @Tempratures = 350, @PrepTimeMin = 30, @Price = 90, @Refs = 'brownie_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Apple Pie', @Portions = 8, @Tempratures = 375, @PrepTimeMin = 45, @Price = 95, @Refs = 'pie_recipe_2';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Peanut Butter Cookies', @Portions = 24, @Tempratures = 350, @PrepTimeMin = 20, @Price = 70, @Refs = 'cookie_recipe_2';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Strawberry Shortcake', @Portions = 8, @Tempratures = 325, @PrepTimeMin = 30, @Price = 120, @Refs = 'cake_recipe_2';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Raspberry Scones', @Portions = 12, @Tempratures = 375, @PrepTimeMin = 25, @Price = 80, @Refs = 'scone_recipe_1';
+EXEC dbo.InsertIntoRecipes @RecipesName = 'Peach Cobbler', @Portions = 8, @Tempratures = 350, @PrepTimeMin = 40, @Price = 105, @Refs = 'cobbler_recipe_1';
+
 GO
 CREATE PROCEDURE dbo.InsertIntoBakeries 
     @BakeryName VARCHAR(50)
@@ -575,6 +592,24 @@ EXEC dbo.InsertIntoRecipesCategory @RecipeId = 1, @CategoryId = 1;
 EXEC dbo.InsertIntoRecipesCategory @RecipeId = 2, @CategoryId = 2;
 EXEC dbo.InsertIntoRecipesCategory @RecipeId = 3, @CategoryId = 3;
 EXEC dbo.InsertIntoRecipesCategory @RecipeId = 4, @CategoryId = 4;
+
+-- this is sudo data
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 5, @CategoryId = 1;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 6, @CategoryId = 2;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 7, @CategoryId = 3;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 8, @CategoryId = 4;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 9, @CategoryId = 5;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 10, @CategoryId = 1;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 11, @CategoryId = 2;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 12, @CategoryId = 3;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 13, @CategoryId = 4;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 14, @CategoryId = 5;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 15, @CategoryId = 1;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 16, @CategoryId = 2;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 17, @CategoryId = 3;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 18, @CategoryId = 4;
+EXEC dbo.InsertIntoRecipesCategory @RecipeId = 19, @CategoryId = 5;
+
 GO
 CREATE PROCEDURE dbo.InsertIntoRecipesProducts 
     @RecipeId INT,
@@ -666,3 +701,28 @@ GO
 EXEC dbo.InsertIntoRecipesIngredients  @RecipeId = 1,  @IngredientId = 1;
 EXEC dbo.InsertIntoRecipesIngredients  @RecipeId = 2,  @IngredientId = 2;
 EXEC dbo.InsertIntoRecipesIngredients  @RecipeId = 3,  @IngredientId = 3;
+
+GO
+CREATE PROCEDURE dbo.SelectRecipeByCategory @CategoryId INT AS BEGIN WITH temp (RecipieId) AS (
+    SELECT
+        RecipesCategory.RecipeId
+    FROM
+        RecipesCategory
+    WHERE
+        RecipesCategory.CategoryId = @CategoryId
+)
+SELECT
+    *
+FROM
+    Recipes,
+    temp
+WHERE
+    Recipes.RecipeId = temp.RecipieId
+END;
+
+GO
+CREATE PROCEDURE dbo.SelectCategories 
+AS
+BEGIN
+    SELECT CategoryName FROM Categories;
+END;
