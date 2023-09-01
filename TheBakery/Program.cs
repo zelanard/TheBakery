@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TheBakery.GUI;
 
 namespace TheBakery
 {
@@ -16,7 +17,7 @@ namespace TheBakery
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new TheBakery());
+            Application.Run(new LoginFormV2());
         }
     }
 }
