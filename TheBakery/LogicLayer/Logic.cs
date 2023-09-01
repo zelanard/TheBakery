@@ -1,12 +1,6 @@
-﻿using System.Collections.Generic;
-using TheBakery.DataAccessLayer;
-﻿using System.Text.RegularExpressions;
+﻿using TheBakery.DataAccessLayer;
 using System;
-using TheBakery.DataAccessLayer;
-using System.Data.SqlClient;
-using System.Data;
 using System.Windows.Forms;
-using BCrypt.Net;
 
 namespace TheBakery.LogicLayer
 {
@@ -31,13 +25,13 @@ namespace TheBakery.LogicLayer
         public static string[] GetCategories()
         {
             return DataAccess.GetListOfCategories();
-        //readonly DataAccess UserItems = new DataAccess();
-        //public object[] GetProducts(string Category)
-        //{
-        //    return UserItems.GetProducts(Category);
-        //}
+            //readonly DataAccess UserItems = new DataAccess();
+            //public object[] GetProducts(string Category)
+            //{
+            //    return UserItems.GetProducts(Category);
+            //}
+        }
     }
-
 
 
     public class UserLogIn
@@ -95,7 +89,7 @@ namespace TheBakery.LogicLayer
     {
         Admin,
         Staff,
-        Customer,
+        Custommer,
         None
     }
     /// <summary>

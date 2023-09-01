@@ -119,6 +119,7 @@ namespace TheBakery
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "TheBakery";
             this.Text = "TheBakery";
+            this.FormClosed += TheBakery_FormClosed;
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);

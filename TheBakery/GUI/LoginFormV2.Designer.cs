@@ -66,7 +66,6 @@
             this.InputPassword.Size = new System.Drawing.Size(110, 23);
             this.InputPassword.TabIndex = 12;
             this.InputPassword.UseSystemPasswordChar = true;
-            this.InputPassword.TextChanged += new System.EventHandler(this.InputPassword_TextChanged);
             // 
             // InputUserName
             // 
@@ -75,7 +74,6 @@
             this.InputUserName.Name = "InputUserName";
             this.InputUserName.Size = new System.Drawing.Size(110, 23);
             this.InputUserName.TabIndex = 11;
-            this.InputUserName.TextChanged += new System.EventHandler(this.InputUserName_TextChanged);
             // 
             // label2
             // 

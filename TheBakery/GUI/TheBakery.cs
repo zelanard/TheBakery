@@ -22,6 +22,9 @@ namespace TheBakery
             PopulateCategories();
         }
 
+        /// <summary>
+        /// Add a list of categories to hte items in the categories listbox.
+        /// </summary>
         private void PopulateCategories()
         {
             string[] items = Logic.GetCategories();
@@ -32,15 +35,24 @@ namespace TheBakery
             }
         }
 
+        /// <summary>
+        /// When selecting a new category of products, display new products.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (sender is ListBox lb)
             {
-                GetProducts(lb.SelectedIndex+1);
+                DisplayProducts(lb.SelectedIndex+1);
             }
         }
 
-        private void GetProducts(int categoryId)
+        /// <summary>
+        /// Display a range of products.
+        /// </summary>
+        /// <param name="categoryId"></param>
+        private void DisplayProducts(int categoryId)
         {
             this.displayPanel.Controls.Clear();
             Product[] product = Logic.GetProducts(categoryId);
@@ -55,6 +67,15 @@ namespace TheBakery
                 this.displayPanel.Controls.Add(displayProduct);
                 X += 205;
             }
+        }
+        /// <summary>
+        /// Close the applicaiton hwen the form close.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TheBakery_FormClosed(object sender, System.Windows.Forms.FormClosedEventArgs e)
+        {
+            Application.Exit();
         }
     }
 }

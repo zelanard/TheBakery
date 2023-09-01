@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 
 namespace TheBakery.DataAccessLayer
 {
+    /// <summary>
+    /// Collect data from the database.
+    /// </summary>
     public static class DataAccess
     {
         public const string DB_CONNECTION_STRING = @"Data Source=BALDER\MSSQLSERVER01;Initial Catalog=TheBakery;Integrated Security=True";
@@ -81,17 +81,6 @@ namespace TheBakery.DataAccessLayer
     /****************************************************************
      * Here Be Logic: All of this should be moved to the logic layer!
      ***************************************************************/
-    public class Cities
-    {
-        int PostalCode { get; set; }
-        string CName { get; set; }
-    }
-
-    public class Roles
-    {
-        int RoleId { get; set; }
-        string RoleName { get; set; }
-    }
 
     /// <summary>
     /// Product Data Item
@@ -121,6 +110,9 @@ namespace TheBakery.DataAccessLayer
         }
     }
 
+    /// <summary>
+    /// Contains Recipie Data
+    /// </summary>
     public class Recipes
     {
         public int RecipeId { get; set; }
@@ -132,38 +124,11 @@ namespace TheBakery.DataAccessLayer
         public string Refs { get; set; }
     }
 
-    public class Bakeries
-    {
-        int BakeryId { get; set; }
-        string BakeryName { get; set; }
-    }
-
-    public class Categories
-    {
-        public int CategoryId { get; set; }
-        public string CategoryName { get; set; }
-    }
-
-    public class Persons
-    {
-        int PersonId { get; set; }
-        string FristName { get; set; }
-        string LastName { get; set; }
-        string StreetAddress { get; set; }
-        string Floor { get; set; }
-        string Country { get; set; }
-        Cities Cities { get; set; }
-
-    }
-
+    /// <summary>
+    /// Control User Login and User Roles.
+    /// </summary>
     public class Users
     {
-        string EMail { get; set; }
-        string Username { get; set; }
-        string PASSWORD { get; set; }
-        string Tlf { get; set; }
-        Persons Persons { get; set; }
-
         /// <summary>
         /// THIS SHOULE BE PART OF THE BLL: 
         /// HERE IS THE UerDataAccess class
@@ -187,28 +152,28 @@ namespace TheBakery.DataAccessLayer
         /// <returns></returns>
         public string LogUserInAndGetUserRole(string userName, string password)
         {
-            string connectionString = @"Data Source=ZBC-S-tian0247\SQLEXPRESS;Initial Catalog=TheBakery;Integrated Security=True";
+            string connectionString = DataAccess.DB_CONNECTION_STRING;
             string userRole = "Wrong username or password.";
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
                 string selectCommand = "SELECT EMail From Users WHERE Username = (@Username) AND PASSWORD = (@Password)";
 
-                // ----------------------------------- Salt and hashed version ---------------------------------------
+                /** ----------------------------------- Salt and hashed version ---------------------------------------
                 // Now we can not select the password direct, so only find the EMail
                 // We also need to retrieve corresponding salt for the specific user from the DB
                 // string selectCommand = "SELECT Username, PASSWORD, Salt From Users WHERE Username = (@Username)";
-                // ---------------------------------------------------------------------------------------------------
+                // ---------------------------------------------------------------------------------------------------*/
 
                 using (SqlCommand sCommand = new SqlCommand(selectCommand, conn))
                 {
                     sCommand.Parameters.AddWithValue("@Username", userName);
                     sCommand.Parameters.AddWithValue("@PASSWORD", password);
 
-                    // ---------------- Salt and hashed version------------------
+                    /** ---------------- Salt and hashed version------------------
                     // We only +need to add UserNamer here
                     // sCommand.Parameters.AddWithValue("@Username", userName);
-                    // ----------------------------------------------------------
+                    // ----------------------------------------------------------*/
 
                     /* Use of DataReader,when you need to retrieve multiple rows of data from a query result 
                      * or when you need to iterate over a result set,
@@ -228,10 +193,10 @@ namespace TheBakery.DataAccessLayer
                             // Get user email of the logged in user
                             string userEMail = reader["EMail"].ToString();
 
-                            // ------------------------------ Salt and hashed version-----------------------------
+                            /** ------------------------------ Salt and hashed version-----------------------------
                             // string storedHashedPassword = reader["PASSWORD"].ToString();
                             // string storedSalt = reader["Salt"].ToString();
-                            // string userEMail = reader["EMail"].ToString();
+                            // string userEMail = reader["EMail"].ToString();*/
 
                             // reader.Close();
 
@@ -256,7 +221,7 @@ namespace TheBakery.DataAccessLayer
                             reader.Close();
 
                             // get connection for the seceond query to retrieve RoleID through EMail
-                             string roleIDQuery = $"SELECT RoleID FROM UsersRoles WHERE EMail = (@userEMail)";
+                            string roleIDQuery = $"SELECT RoleID FROM UsersRoles WHERE EMail = (@userEMail)";
                             using (SqlCommand roleIDCommand = new SqlCommand(roleIDQuery, conn))
                             {
                                 roleIDCommand.Parameters.AddWithValue("@UserEMail", userEMail);
@@ -292,100 +257,5 @@ namespace TheBakery.DataAccessLayer
             }
             return userRole;
         }
-    }
-    public class UsersRoles
-    {
-        int UserRoleId { get; set; }
-        Users Users { get; set; }
-        Roles Roles { get; set; }
-
-    }
-
-    public class Orders
-    {
-        int OrderId { get; set; }
-        int FinalPrice { get; set; }
-        DateTime PickupTime { get; set; }
-        string Requirements { get; set; }
-        string OrderStatus { get; set; }
-        DateTime OrderPlaced { get; set; }
-        Users User { get; set; }
-        Product Products { get; set; }
-    }
-
-    public class StockItems
-    {
-        int StockItemId { get; set; }
-        string ItemName { get; set; }
-        string Brand { get; set; }
-        int Quantity { get; set; }
-        string ItemDescription { get; set; }
-        float PurchasePrice { get; set; }
-        float SalePrice { get; set; }
-        Bakeries Bakeries { get; set; }
-    }
-
-    public class Ingredients
-    {
-        int IngredientId { get; set; }
-        int Quantity { get; set; }
-        StockItems StockItems { get; set; }
-    }
-
-
-    public class BakeriesUsers
-    {
-        int BakeryUserId { get; set; }
-        Bakeries Bakeries { get; set; }
-        Users Users { get; set; }
-    }
-
-    public class ProductCategories
-    {
-        int ProductCategoriesId { get; set; }
-        Product Products { get; set; }
-        Categories Categories { get; set; }
-    }
-
-    public class RecipesCategory
-    {
-        int RecipesCategoryId { get; set; }
-        Recipes Recipes { get; set; }
-        Categories Categories { get; set; }
-    }
-
-    public class RecipesProducts
-    {
-        int RecipesProductsId { get; set; }
-        Recipes Recipes { get; set; }
-        Product Products { get; set; }
-    }
-
-    public class StockItemsCategories
-    {
-        int StockItemCategoryID { get; set; }
-        StockItems StockItems { get; set; }
-        Categories Categories { get; set; }
-    }
-
-    public class RecipesBakeries
-    {
-        int RecipeBakeryId { get; set; }
-        Recipes Recipes { get; set; }
-        Bakeries Bakeries { get; set; }
-    }
-
-    public class RecipesIngredients
-    {
-        int RecipeIngredientId { get; set; }
-        Recipes Recipes { get; set; }
-        Ingredients Ingredients { get; set; }
-    }
-
-    public class OrdersProducts
-    {
-        int OrderProductId { get; set; }
-        Orders Orders { get; set; }
-        Product Products { get; set; }
     }
 }
